@@ -1,3 +1,6 @@
+; re-process the output files from RADMC-3D. Regrid the density and temperature in spherical coordinate 
+; built in RADMC-3D to cartesian coordinate. 
+
 pro angles_to_xyz,r,phi,theta,x,y,z
   DRADEG = 180.d0/!dpi
   x = r * cos(phi / DRADEG) * sin(theta / DRADEG)
@@ -24,7 +27,7 @@ pro pm_coord_regrid,filein_grid,filein_dt,fileout,ncube,bl,bu,LINEAR=linear
   nphi=n_elements(grid_phi_s)
 
   print,'size of coordinate',nr,ntheta,nphi
-  au=1.49597871*10.0^13.0
+  au=1.49597871*10.0^13.0 
   grid_r=grid_r_s/au ;change the unit to au
 
   x_t=fltarr(nr,ntheta,nphi)
@@ -39,7 +42,6 @@ pro pm_coord_regrid,filein_grid,filein_dt,fileout,ncube,bl,bu,LINEAR=linear
         x_t[i,j,k]=x
         y_t[i,j,k]=y
         z_t[i,j,k]=z
-
       endfor
     endfor
   endfor  
@@ -75,7 +77,6 @@ pro pm_coord_regrid,filein_grid,filein_dt,fileout,ncube,bl,bu,LINEAR=linear
   z_new=(z_c[0:ncube-1]+z_c[1:ncube])/2.0
 
   n_new_grid=n_elements(z_new)
-  
   print,'new_grid',n_new_grid,n_new_grid,n_new_grid
   
   regrid_dens=fltarr(n_new_grid,n_new_grid,n_new_grid)
@@ -83,43 +84,36 @@ pro pm_coord_regrid,filein_grid,filein_dt,fileout,ncube,bl,bu,LINEAR=linear
 
 
   for j=0,n_new_grid-1 do begin
-    
     count=0l
     x_s=fltarr(1000000) & y_s=fltarr(1000000)
     dens_s=fltarr(1000000) & temp_s=fltarr(1000000)
-
     diff=z_t_r-z_new[j]
-    
-
-for i=0,n_grid-1 do begin
-  if abs(z_t_r[i]-z_new[j]) le 0.2  then begin
-
-    x_s[count]=x_t_r[i]
-    y_s[count]=y_t_r[i]
-    dens_s[count]=dens_r[i]
-    temp_s[count]=temp_r[i]
-    count=count+1
-  endif
-
-endfor
-print,count,z_new[j]
-
-x=x_s[0:count-1]
-y=y_s[0:count-1]
-print,minmax(abs(x)),minmax(abs(y))
-dens=dens_s[0:count-1]
-temp=temp_s[0:count-1]
-TRIANGULATE, x, y, tr, b
-res_dens=TRIGRID(x, y, dens, tr,xout=x_new,yout=y_new)
-res_temp=TRIGRID(x, y, temp, tr,xout=x_new,yout=y_new)
-print,minmax(res_dens),minmax(dens),minmax(res_temp),minmax(temp)
-;  stop
-regrid_dens[*,*,j]=res_dens
-regrid_temp[*,*,j]=res_temp
-   
+    for i=0,n_grid-1 do begin
+      if abs(z_t_r[i]-z_new[j]) le 0.2  then begin
+        x_s[count]=x_t_r[i]
+        y_s[count]=y_t_r[i]
+        dens_s[count]=dens_r[i]
+        temp_s[count]=temp_r[i]
+        count=count+1
+      endif
     endfor
   
+    print,count,z_new[j]
+    x=x_s[0:count-1]
+    y=y_s[0:count-1]
+    print,minmax(abs(x)),minmax(abs(y))
+    dens=dens_s[0:count-1]
+    temp=temp_s[0:count-1]
+    TRIANGULATE, x, y, tr, b
+    res_dens=TRIGRID(x, y, dens, tr,xout=x_new,yout=y_new)
+    res_temp=TRIGRID(x, y, temp, tr,xout=x_new,yout=y_new)
+    print,minmax(res_dens),minmax(dens),minmax(res_temp),minmax(temp)
+;  stop
+    regrid_dens[*,*,j]=res_dens
+    regrid_temp[*,*,j]=res_temp
+   
+  endfor
+  
   save,x_c,x_new,regrid_dens,regrid_temp,filename=fileout
- 
-end
+  end
 
