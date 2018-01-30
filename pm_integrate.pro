@@ -18,12 +18,25 @@ pro ms_b,b_x,b_y,b_z,incl,xi,gamma
   gamma=atan(b_z_new,sqrt(b_y_new^2+b_x^2))
   undefine,b_x,b_y_new,b_z_new 
 end
+;========================================================================
+;Input:
+;kp, kl: the opacities along the two directions
+;file: the name of the file that contains the regrid density and temperature
+;ms: the structure that contains magentic field geometry B_x, B_y, B_z
+;incl: inclination of the object
+;wave: wavelength of the intensity
+;nout: size of the output image
+;R_val: the alignment efficiency 
 
+;Output:
+;I_obs: total intensity
+;U_obs, Q_obs: stokes parameters
+;===========================================================================
 
 pro pm_integrate,kp,kl,file,ms,incl,I_obs,U_obs,Q_obs,wave,nout,R_val
   
   ;AU  = 1.49598d13     ; Astronomical Unit       [cm]
-   ;at wavelength 10 mum
+  ;at wavelength 10 mum
 
   restore,filename=file
   ; rot around x axis
@@ -46,8 +59,8 @@ pro pm_integrate,kp,kl,file,ms,incl,I_obs,U_obs,Q_obs,wave,nout,R_val
   U_i=dblarr(ncube,ncube)
   Q_i=dblarr(ncube,ncube)
   
-
- S = CALL_EXTERNAL('pol_model.so', 'cal_integrate_', kp,kl,double(wave),double(dens),double(temp),R,$
+ ; This line calls an external fortran code to do the intergration which is faster 
+  S = CALL_EXTERNAL('pol_model.so', 'cal_integrate_', kp,kl,double(wave),double(dens),double(temp),R,$
   I_i,Q_i,U_i,fix(ncube),double(x_c),double(gam),double(xi))
 
   I_obs=rebin(I_i,nout,nout)
