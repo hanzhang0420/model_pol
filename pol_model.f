@@ -1,5 +1,5 @@
-      SUBROUTINE cal_integrate(ARGC, ARGV)
-
+      SUBROUTINE cal_integrate(ARGC, ARGV) 
+C     external function that is called in pm_integrate.pro 
       implicit none
       INTEGER*8 ARGC
       INTEGER*8 ARGV(*)                   !Argc and argv are integers copied from the example on website
