@@ -1,5 +1,6 @@
 ; re-process the output files from RADMC-3D. Regrid the density and temperature in spherical coordinate 
 ; built in RADMC-3D to cartesian coordinate. 
+; convert (r,theta,phi) spherical cooridnate to (x,y,z) cartesian coordinate. 
 
 pro angles_to_xyz,r,phi,theta,x,y,z
   DRADEG = 180.d0/!dpi
