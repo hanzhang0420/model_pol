@@ -39,7 +39,7 @@ tmpu_i=(P_BIN_SIMPLE(I,m))
 help,tmpu_i
 ;res=p_percent_theta(tmpu_bin/tmpu_i,tmpq_bin/tmpu_i,du,dq)
 ;p=percent_check(res.percent,1.0)
-;theta=res.theta+90 ; by definition, the angle is east from north but for python to plot the image
+;theta=res.theta+90 ;by definition, the angle is east from north but for python to plot the image
 
 
 ip=sqrt(Q^2+U^2)
